@@ -164,7 +164,7 @@ public class CustomerService {
          }
          String videoAddress =uploadUtil.uploadSelfie(video,uniqueCode+".mp4");
 
-        videoUploader.upload(videoAddress,customerEntity.get().getImagePath());
+        videoUploader.upload(videoAddress,customerEntity.get().getImagePath(),uniqueCode);
         return null;
 
     }

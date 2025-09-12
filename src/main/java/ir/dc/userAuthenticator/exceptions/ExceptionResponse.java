@@ -10,12 +10,14 @@ import lombok.NoArgsConstructor;
 public class ExceptionResponse {
     private int code;
     private String desc;
+    private String message;
 
     @Override
     public String toString() {
         return "ExceptionResponse{" +
                 "code=" + code +
                 ", desc='" + desc + '\'' +
+                ", message='" + message + '\'' +
                 '}';
     }
 }

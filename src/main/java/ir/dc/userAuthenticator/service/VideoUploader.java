@@ -1,23 +1,19 @@
 package ir.dc.userAuthenticator.service;
 
-import ir.dc.userAuthenticator.dto.CustomerInfoRequestDto;
-import ir.dc.userAuthenticator.dto.SabtAhvalInfoResponseWrapper;
 import ir.dc.userAuthenticator.dto.SabtAhvalTokenResponse;
 import ir.dc.userAuthenticator.exceptions.CustomException;
 import ir.dc.userAuthenticator.exceptions.ErrorCode;
 import ir.dc.userAuthenticator.util.UploadUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.core5.http.ContentType;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
-import org.bytedeco.opencv.opencv_videoio.VideoCapture;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -25,8 +21,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.file.Path;
+import java.util.List;
 
 
 @Service
@@ -63,32 +59,63 @@ public class VideoUploader {
 
 
 
-    public void upload(String selfieAddress,String customerImageAddress) throws IOException {
+    public void upload(String selfieAddress, String customerImageAddress, String filename) throws IOException {
          File customerImage= new File(customerImageAddress);
          File selfie= new File(selfieAddress);
-         byte[] frame=getFrame(selfieAddress);
+         File frame=getFrame(selfieAddress,filename);
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
         // Add files to the body
-        body.add("Image",customerImage);
-        body.add("ReferenceImage", selfie);
-        body.add("Video", frame);
+//        body.add("Image",frame);
+//        body.add("ReferenceImage", frame);
+//        body.add("Video", selfie);
         body.add("ImageThreshold", 1);
-//        body.add("VideoThreshold", frame);
-//        body.add("Preprocess", false);
 
+        ByteArrayResource contentsAsResource = new ByteArrayResource(Files.readAllBytes(Path.of(customerImage.getPath()))){
+            @Override
+            public String getFilename(){
+                return "Image.jpg";
+            }
+        };
+
+        ByteArrayResource ref = new ByteArrayResource(Files.readAllBytes(Path.of(frame.getPath()))){
+            @Override
+            public String getFilename(){
+                return "ref.jpg";
+            }
+        };
+        body.add("Image",contentsAsResource);
+        body.add("ReferenceImage",ref);
+
+        ByteArrayResource video = new ByteArrayResource(Files.readAllBytes(Path.of(selfie.getPath()))){
+            @Override
+            public String getFilename(){
+                return "selfie.mp4";
+            }
+        };
+        body.add("Video",video);
+
+//
         // Set headers
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        headers.setBearerAuth(getToken());
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+               headers.setBearerAuth(getToken());
 
-        // Create request entity with the image byte array
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        HttpEntity requestEntity = new HttpEntity<>(body, headers);
+
+///////////////////////
 
         // Send the request
-        ResponseEntity<Object> response = restTemplate.exchange(API_URL, HttpMethod.POST, requestEntity, Object.class);
-        System.out.println("Response from server: " + response);
+        try{
+
+            ResponseEntity<Object> response = restTemplate.exchange(API_URL, HttpMethod.POST, requestEntity, Object.class);
+            System.out.println("Response from server: " + response);
+        }catch (Exception e){
+            throw new CustomException(e.getMessage());
+
+        }
     }
 
     private String getToken() {
@@ -116,8 +143,9 @@ public class VideoUploader {
 
     }
 
-    public byte[] getFrame(String videoAddress) throws IOException {
+    public File getFrame(String videoAddress, String filename) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        File file=new File(uploadAddress+imagePath+filename+"_frame.jpg");
 
         File videoFile = new File(videoAddress);
         FFmpegFrameGrabber frameGrabber = new FFmpegFrameGrabber(videoFile);
@@ -130,10 +158,10 @@ public class VideoUploader {
             frameGrabber.setFrameNumber(frameNumber);
             Frame f = frameGrabber.grab();
             BufferedImage bi = c.convert(f);
-           var a= ImageIO.write(bi,"jpg",baos);
+           var a= ImageIO.write(bi,"jpg",file);
 
         frameGrabber.stop();
-        return baos.toByteArray();
+        return file;
     }
 
 }

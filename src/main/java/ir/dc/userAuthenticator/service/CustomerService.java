@@ -22,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -235,13 +236,23 @@ public class CustomerService {
         return customerRepository.findByNationalCode(nationalCode);
     }
 
-    @Transactional
-    public void acceptConditions(String userCode) {
+    public CustomerEntity acceptConditions(String userCode) {
         var opt= customerRepository.findByUniqueCode(userCode);
         if(opt.isPresent()){
             var ent= opt.get();
             ent.setConditionAccepted(true);
+            ent.setIssuedDate(LocalDateTime.now());
             customerRepository.save(ent);
+            return ent;
         }
+        return null;
+    }
+
+    public CustomerEntity getByCode(String userCode) {
+        var opt= customerRepository.findByUniqueCode(userCode);
+        if(opt.isPresent()){
+            return opt.get();
+        }
+        return null;
     }
 }

@@ -1,5 +1,6 @@
 package ir.dc.userAuthenticator.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import ir.dc.userAuthenticator.dto.CustomerDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,7 @@ public class CustomerEntity {
     private String mobileNumber;
     private String nationalCode;
     private String birthdate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime issuedDate;
     private boolean conditionAccepted=false;
 

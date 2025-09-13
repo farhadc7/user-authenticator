@@ -1,6 +1,7 @@
 package ir.dc.userAuthenticator.controller;
 
 import ir.dc.userAuthenticator.dto.CustomerInfoRequestDto;
+import ir.dc.userAuthenticator.entity.CustomerEntity;
 import ir.dc.userAuthenticator.service.CustomerService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,8 +27,13 @@ public class CustomerController {
     public String validateVideo(@RequestParam("video") MultipartFile video,@RequestParam String userCode) throws IOException {
         return customerService.validateVideo(video,userCode);
     }
-    @PutMapping("/accept-conditions")
-    public void acceptConditions(@RequestParam String userCode)  {
-         customerService.acceptConditions(userCode);
+    @PostMapping("/accept-conditions")
+    public CustomerEntity acceptConditions(@RequestParam("userCode") String userCode)  {
+        return customerService.acceptConditions(userCode);
+    }
+
+    @GetMapping("/find-by-code")
+    public CustomerEntity getByCode(@RequestParam String userCode)  {
+       return customerService.getByCode(userCode);
     }
 }

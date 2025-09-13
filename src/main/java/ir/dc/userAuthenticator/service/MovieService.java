@@ -3,8 +3,12 @@ package ir.dc.userAuthenticator.service;
 import ir.dc.userAuthenticator.dto.MovieDto;
 import ir.dc.userAuthenticator.dto.MovieRequestDto;
 import ir.dc.userAuthenticator.dto.MovieStatus;
+import ir.dc.userAuthenticator.dto.PaginationResponseDto;
 import ir.dc.userAuthenticator.entity.Movie;
 import ir.dc.userAuthenticator.repository.MovieRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,5 +58,12 @@ public class MovieService {
     }
     private Movie mapper(MovieRequestDto dto) {
         return new Movie(dto.getMovieName(),MovieStatus.ACTIVE);
+    }
+
+    public PaginationResponseDto<Movie> getAllEnable(int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page, pageSize);
+        Page<Movie> result =repository.findAllByStatusIs(MovieStatus.ACTIVE,pageable);
+        return new PaginationResponseDto<Movie>(page,pageSize,result.getTotalPages(),
+                result.getTotalElements(),result.getContent());
     }
 }

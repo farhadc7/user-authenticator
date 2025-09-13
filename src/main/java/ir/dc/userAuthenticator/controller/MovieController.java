@@ -1,6 +1,8 @@
 package ir.dc.userAuthenticator.controller;
 
 import ir.dc.userAuthenticator.dto.MovieRequestDto;
+import ir.dc.userAuthenticator.dto.PaginationResponseDto;
+import ir.dc.userAuthenticator.entity.Movie;
 import ir.dc.userAuthenticator.service.MovieService;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +23,13 @@ public class MovieController {
     @PutMapping("/disable")
     public void disable(@RequestParam long movieId){
         movieService.disableMovie(movieId);
+    }
+
+    @GetMapping("/all")
+    public PaginationResponseDto<Movie>  getAllEnable(@RequestParam(defaultValue ="0" ) int page,
+                                @RequestParam(defaultValue = "10") int pageSize){
+        return movieService.getAllEnable(page,pageSize);
+
     }
 
     @PutMapping("/enable")

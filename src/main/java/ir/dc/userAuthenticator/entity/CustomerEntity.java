@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -14,10 +16,13 @@ public class CustomerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true)
     private String uniqueCode;
     private String mobileNumber;
     private String nationalCode;
     private String birthdate;
+    private LocalDateTime issuedDate;
+    private boolean conditionAccepted=false;
 
     @ManyToOne
     private Movie movie;

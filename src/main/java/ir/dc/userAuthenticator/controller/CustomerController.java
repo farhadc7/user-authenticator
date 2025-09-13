@@ -26,4 +26,8 @@ public class CustomerController {
     public String validateVideo(@RequestParam("video") MultipartFile video,@RequestParam String userCode) throws IOException {
         return customerService.validateVideo(video,userCode);
     }
+    @PutMapping("/accept-conditions")
+    public void acceptConditions(@RequestParam String userCode)  {
+         customerService.acceptConditions(userCode);
+    }
 }

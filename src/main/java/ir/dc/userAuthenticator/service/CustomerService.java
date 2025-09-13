@@ -11,8 +11,13 @@ import ir.dc.userAuthenticator.util.UploadUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -145,6 +150,36 @@ public class CustomerService {
         return c;
     }
 
+    public PaginationResponseDto<CustomerEntity> getAllCustomers(int page, int pageSize,CustomerEntity c) {
+        Pageable p=PageRequest.of(page,pageSize);
+        Specification<CustomerEntity> sp= Specification.anyOf();
+        if(c.getUniqueCode()!= null){
+            sp.and((root,query,cb)->
+                cb.equal(root.get("uniqueCode"),c.getUniqueCode())
+            );
+        }
+        if(c.getNationalCode()!= null){
+            sp.and((root,query,cb)->
+                    cb.equal(root.get("nationalCode"),c.getNationalCode())
+            );
+        }
+        if(c.getUniqueCode()!= null){
+            sp.and((root,query,cb)->
+                    cb.equal(root.get("uniqueCode"),c.getUniqueCode())
+            );
+        }
+        if(c.getMovie()!= null){
+            sp.and((root,query,cb)->
+                    cb.equal(root.get("movie.name"),c.getMovie().getName())
+            );
+        }
+
+
+        Page<CustomerEntity> result =customerRepository.findAll(sp,p);
+        return new PaginationResponseDto<CustomerEntity>(page,pageSize,result.getTotalPages(),
+                result.getTotalElements(),result.getContent());
+    }
+
     private CustomerEntity mapToEntity(CustomerDto dto) {
         Movie movie = movieService.findById(dto.getMovieId());
         var ent = new CustomerEntity(dto.getMobileNumber(),dto.getUniqueCode(),
@@ -198,5 +233,15 @@ public class CustomerService {
 
     private Optional<CustomerEntity> findByNationalCode(String nationalCode) {
         return customerRepository.findByNationalCode(nationalCode);
+    }
+
+    @Transactional
+    public void acceptConditions(String userCode) {
+        var opt= customerRepository.findByUniqueCode(userCode);
+        if(opt.isPresent()){
+            var ent= opt.get();
+            ent.setConditionAccepted(true);
+            customerRepository.save(ent);
+        }
     }
 }

@@ -15,9 +15,7 @@ public class CustomerEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String uniqueCode;
-    @Column(unique = true)
     private String mobileNumber;
-    @Column(unique = true)
     private String nationalCode;
     private String birthdate;
 

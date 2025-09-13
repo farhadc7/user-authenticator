@@ -1,6 +1,7 @@
 package ir.dc.userAuthenticator.controller;
 
 import ir.dc.userAuthenticator.dto.JwtResponse;
+import ir.dc.userAuthenticator.dto.SignupDto;
 import ir.dc.userAuthenticator.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +16,18 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestParam String username, @RequestParam String password) {
-        userService.signup(username, password);
+    public ResponseEntity<String> signup(@RequestBody SignupDto signupDto) {
+        userService.signup(signupDto.getUsername(),signupDto.getPassword());
         return ResponseEntity.ok("User registered successfully!");
     }
 
     @PostMapping("/login")
-    public JwtResponse login(@RequestParam String username, @RequestParam String password, HttpServletRequest request) {
-        return userService.login(username, password,request);
+    public JwtResponse login(@RequestBody SignupDto d, HttpServletRequest request) {
+        return userService.login(d.getUsername(), d.getPassword(),request);
 
+    }
+    @GetMapping("/test")
+    public String test(){
+        return "test succeeded";
     }
 }

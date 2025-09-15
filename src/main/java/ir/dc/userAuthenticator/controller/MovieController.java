@@ -21,19 +21,19 @@ public class MovieController {
         movieService.save(dto);
     }
     @PutMapping("/disable")
-    public void disable(@RequestParam long movieId){
+    public void disable(@RequestParam("movieId") long movieId){
         movieService.disableMovie(movieId);
     }
 
     @GetMapping("/all")
-    public PaginationResponseDto<Movie>  getAllEnable(@RequestParam(defaultValue ="0" ) int page,
-                                @RequestParam(defaultValue = "10") int pageSize){
+    public PaginationResponseDto<Movie>  getAllEnable(@RequestParam(name="page",defaultValue ="0" ) int page,
+                                @RequestParam(name = "pageSize",defaultValue = "10") int pageSize){
         return movieService.getAllEnable(page,pageSize);
 
     }
 
     @PutMapping("/enable")
-    public void enable(@RequestParam long movieId){
+    public void enable(@RequestParam("movieId") long movieId){
         movieService.enableMovie(movieId);
     }
 }

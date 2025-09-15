@@ -113,7 +113,7 @@ public class VideoUploader {
             ResponseEntity<Object> response = restTemplate.exchange(API_URL, HttpMethod.POST, requestEntity, Object.class);
             System.out.println("Response from server: " + response);
         }catch (Exception e){
-            throw new CustomException(e.getMessage());
+            throw new CustomException(ErrorCode.SABTAHVALERROR,e.getMessage());
 
         }
     }

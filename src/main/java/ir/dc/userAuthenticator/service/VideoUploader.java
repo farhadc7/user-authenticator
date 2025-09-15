@@ -117,7 +117,13 @@ public class VideoUploader {
                 return response.getBody().getData();
             }else {
                 System.out.println("Response from server: " + response);
-                throw new CustomException(ErrorCode.SABTAHVALERROR, response.getBody()!= null?response.getBody().toString(): response.getStatusCode().toString());
+                if(response.getBody()!= null && response.getBody().toString().contains("1073")){
+
+                    throw new CustomException(ErrorCode.SABTAHVAL_NOT_MATCH, response.getBody()!= null?response.getBody().toString(): response.getStatusCode().toString());
+                }else {
+                    throw new CustomException(ErrorCode.SABTAHVAL_MATCHING_ISSUE, response.getBody()!= null?response.getBody().toString(): response.getStatusCode().toString());
+
+                }
             }
 
         }catch (Exception e){

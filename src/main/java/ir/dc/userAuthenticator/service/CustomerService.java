@@ -50,6 +50,8 @@ public class CustomerService {
 
     @Value("${sabt.ahval.auth.pass}")
     private String sabtAhvalPass;
+    @Value("${video.format}")
+    private String videoFormat;
 
     public CustomerService(CustomerRepository customerRepository, MovieService movieService, UploadUtil uploadUtil, VideoUploader videoUploader) {
         this.customerRepository = customerRepository;
@@ -199,7 +201,7 @@ public class CustomerService {
              log.error("validateVideo : user not found with unique code : "+uniqueCode);
              throw new CustomException(ErrorCode.USER_NOT_FOUND);
          }
-         String videoAddress =uploadUtil.uploadSelfie(video,uniqueCode+".mp4");
+         String videoAddress =uploadUtil.uploadSelfie(video,uniqueCode+"."+videoFormat);
 
         videoUploader.upload(videoAddress,customerEntity.get().getImagePath(),uniqueCode);
         return null;

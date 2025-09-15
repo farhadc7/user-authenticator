@@ -26,7 +26,7 @@ public class CustomerController {
     }
 
     @PostMapping("/validate-video")
-    public String validateVideo(@RequestParam("video") MultipartFile video,@RequestParam String userCode) throws IOException {
+    public String validateVideo(@RequestParam("video") MultipartFile video,@RequestParam("userCode") String userCode) throws IOException {
         return customerService.validateVideo(video,userCode);
     }
     @PostMapping("/accept-conditions")
@@ -35,12 +35,13 @@ public class CustomerController {
     }
 
     @GetMapping("/find-by-code")
-    public CustomerEntity getByCode(@RequestParam String userCode)  {
+    public CustomerEntity getByCode(@RequestParam("userCode") String userCode)  {
        return customerService.getByCode(userCode);
     }
 
     @PostMapping("/get-all")
-    public PaginationResponseDto<CustomerEntity> getAll(@RequestParam int page , @RequestParam int pageSize){
+    public PaginationResponseDto<CustomerEntity> getAll(@RequestParam(name = "page",defaultValue = "0")
+                                                            int page , @RequestParam(name="pageSize",defaultValue = "10") int pageSize){
         return customerService.getAllCustomers(page,pageSize,null);
     }
 

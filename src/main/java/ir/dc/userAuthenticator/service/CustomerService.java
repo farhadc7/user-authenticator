@@ -45,6 +45,9 @@ public class CustomerService {
     @Value("${sabt.ahval.image}")
     private String sabtahvalImageUrl;
 
+    @Value("${video.similarity}")
+    private String videoSimilarity;
+
     @Value("${sabt.ahval.auth.user}")
     private String sabtAhvalUsername;
 
@@ -193,7 +196,7 @@ public class CustomerService {
         return ent;
     }
 
-    public String validateVideo(MultipartFile video, String uniqueCode) throws IOException {
+    public VideoValidationResponse validateVideo(MultipartFile video, String uniqueCode) throws IOException {
          Optional<CustomerEntity> customerEntity = customerRepository.findByUniqueCode(uniqueCode);
          if(customerEntity.isEmpty()){
              log.error("validateVideo : user not found with unique code : "+uniqueCode);
@@ -201,8 +204,49 @@ public class CustomerService {
          }
          String videoAddress =uploadUtil.uploadSelfie(video,uniqueCode+".mp4");
 
-        videoUploader.upload(videoAddress,customerEntity.get().getImagePath(),uniqueCode);
-        return null;
+        var res=videoUploader.upload(videoAddress,customerEntity.get().getImagePath(),uniqueCode);
+        VideoValidationResponse v= new VideoValidationResponse();
+        v.setImagesVerified(res.isImagesVerified());
+        v.setVideoSimilarity(res.getVideoSimilarity());
+        v.setVideoVerified(res.isVideoVerified());
+        v.setImagesSimilarity(res.getImagesSimilarity());
+        v.setVideoSimilarityThreshold(Double.parseDouble(videoSimilarity));
+
+
+
+
+
+        if(res.getVideoSimilarity()>= Double.parseDouble(videoSimilarity)){
+            v.setSimilar(true);
+        }else {
+            v.setSimilar(false);
+        }
+        return v;
+
+    }
+
+    public VideoValidationResponse validateVideotest() throws IOException {
+
+
+        VideoValidationResponse v= new VideoValidationResponse();
+        v.setImagesVerified(false);
+        v.setVideoSimilarity(3.3);
+        v.setVideoVerified(true);
+        v.setImagesSimilarity(34.8);
+        v.setVideoSimilarityThreshold(Double.parseDouble(videoSimilarity));
+
+        if(50>= Double.parseDouble(videoSimilarity)){
+            v.setSimilar(true);
+        }else {
+            v.setSimilar(false);
+        }
+
+//        if(res.getVideoSimilarity()>= Double.parseDouble(videoSimilarity)){
+//            v.setSimilar(true);
+//        }else {
+//            v.setSimilar(false);
+//        }
+        return v;
 
     }
 

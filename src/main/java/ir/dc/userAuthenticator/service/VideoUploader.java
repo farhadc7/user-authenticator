@@ -1,6 +1,8 @@
 package ir.dc.userAuthenticator.service;
 
 import ir.dc.userAuthenticator.dto.SabtAhvalTokenResponse;
+import ir.dc.userAuthenticator.dto.VideoResponse;
+import ir.dc.userAuthenticator.dto.VideoResponseData;
 import ir.dc.userAuthenticator.exceptions.CustomException;
 import ir.dc.userAuthenticator.exceptions.ErrorCode;
 import ir.dc.userAuthenticator.util.UploadUtil;
@@ -59,7 +61,7 @@ public class VideoUploader {
 
 
 
-    public void upload(String selfieAddress, String customerImageAddress, String filename) throws IOException {
+    public VideoResponseData upload(String selfieAddress, String customerImageAddress, String filename) throws IOException {
          File customerImage= new File(customerImageAddress);
          File selfie= new File(selfieAddress);
          File frame=getFrame(selfieAddress,filename);
@@ -110,9 +112,16 @@ public class VideoUploader {
         // Send the request
         try{
 
-            ResponseEntity<Object> response = restTemplate.exchange(API_URL, HttpMethod.POST, requestEntity, Object.class);
-            System.out.println("Response from server: " + response);
+            ResponseEntity<VideoResponse> response = restTemplate.exchange(API_URL, HttpMethod.POST, requestEntity, VideoResponse.class);
+            if(response.getStatusCode()==HttpStatus.OK){
+                return response.getBody().getData();
+            }else {
+                System.out.println("Response from server: " + response);
+                throw new CustomException(ErrorCode.SABTAHVALERROR, response.getBody()!= null?response.getBody().toString(): response.getStatusCode().toString());
+            }
+
         }catch (Exception e){
+            System.out.println("Response from server: " + e.getMessage());
             throw new CustomException(ErrorCode.SABTAHVALERROR,e.getMessage());
 
         }

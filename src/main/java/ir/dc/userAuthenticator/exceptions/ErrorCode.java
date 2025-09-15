@@ -91,7 +91,7 @@ public enum ErrorCode {
     SABTAHVALERROR(50401, HttpStatus.Series.SERVER_ERROR,"sabt ahval server is not available." , "ثبت احوال پاسخگو نیست."),
     SABTAHVAL_TOKEN_ERROR(50402, HttpStatus.Series.SERVER_ERROR,"sabt ahval server to get token is not available." , "ثبت احوال پاسخگو نیست."),
     SABTAHVAL_NOT_MATCH(1073, HttpStatus.Series.SERVER_ERROR,"sabt ahval video not matched" , "عکس یا ویدیو ارسالی مورد تایید نمی باشد, مطابق راهنما ارسال نمایید"),
-    SABTAHVAL_MATCHING_ISSUE(50402, HttpStatus.Series.SERVER_ERROR,"sabt ahval not matched " , "مشکل در تطابق"),
+    SABTAHVAL_MATCHING_ISSUE(50403, HttpStatus.Series.SERVER_ERROR,"sabt ahval not matched " , "مشکل در تطابق"),
 
     ZARINPAL_VALIDATION_ERROR(-9,HttpStatus.Series.SERVER_ERROR,"Validation error","خطای اعتبار سنجی "),
     ZARINPAL_TERMINAL_IS_NOT_VALID(-10,HttpStatus.Series.SERVER_ERROR,"Terminal is not valid, please check merchant_id or ip address.","ای پی یا مرچنت كد پذیرنده صحیح نیست."),

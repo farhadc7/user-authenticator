@@ -127,6 +127,12 @@ public class VideoUploader {
             }
 
         }catch (Exception e){
+            if(e instanceof CustomException){
+                throw e;
+            }
+            if(e.getMessage().contains("1073")){
+                throw new CustomException(ErrorCode.SABTAHVAL_NOT_MATCH);
+            }
             System.out.println("Response from server: " + e.getMessage());
             throw new CustomException(ErrorCode.SABTAHVALERROR,e.getMessage());
 

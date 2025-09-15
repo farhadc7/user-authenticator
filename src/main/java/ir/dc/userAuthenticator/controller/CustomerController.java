@@ -29,7 +29,9 @@ public class CustomerController {
     }
 
     @PostMapping("/validate-video")
+
     public VideoValidationResponse validateVideo(@RequestParam("video") MultipartFile video, @RequestParam("userCode") String userCode) throws IOException {
+
         return customerService.validateVideo(video,userCode);
     }
 
@@ -53,7 +55,9 @@ public class CustomerController {
     }
 
     @PostMapping("/get-all")
-    public PaginationResponseDto<CustomerEntity> getAll(@RequestParam("page") int page , @RequestParam("pageSize") int pageSize){
+
+    public PaginationResponseDto<CustomerEntity> getAll(@RequestParam(name = "page",defaultValue = "0")
+                                                            int page , @RequestParam(name="pageSize",defaultValue = "10") int pageSize){
         return customerService.getAllCustomers(page,pageSize,null);
     }
 

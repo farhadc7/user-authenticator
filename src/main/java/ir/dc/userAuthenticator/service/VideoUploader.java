@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -43,6 +44,9 @@ public class VideoUploader {
     @Value("${sabt.ahval.auth.pass}")
     private String sabtAhvalPass;
 
+    @Value("${video.format}")
+    private String videoFormat;
+
     String imagePath = "/images/profile-img/";
     String videoPath = "/video/selfie/";
 
@@ -50,8 +54,7 @@ public class VideoUploader {
     private String tokenUrl;
 
     @Value("${itsaaz.vision.url}")
-    private   String API_URL ;
-
+    private String API_URL;
 
 
     public VideoUploader(RestTemplate restTemplate, UploadUtil uploadUtil) {
@@ -61,10 +64,12 @@ public class VideoUploader {
 
 
 
+
     public VideoResponseData upload(String selfieAddress, String customerImageAddress, String filename) throws IOException {
          File customerImage= new File(customerImageAddress);
          File selfie= new File(selfieAddress);
-         File frame=getFrame(selfieAddress,filename);
+         //File frame=getFrame(selfieAddress,filename);
+
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
@@ -74,35 +79,35 @@ public class VideoUploader {
 //        body.add("Video", selfie);
         body.add("ImageThreshold", 1);
 
-        ByteArrayResource contentsAsResource = new ByteArrayResource(Files.readAllBytes(Path.of(customerImage.getPath()))){
+        ByteArrayResource contentsAsResource = new ByteArrayResource(Files.readAllBytes(Path.of(customerImage.getPath()))) {
             @Override
-            public String getFilename(){
+            public String getFilename() {
                 return "Image.jpg";
             }
         };
 
-        ByteArrayResource ref = new ByteArrayResource(Files.readAllBytes(Path.of(frame.getPath()))){
+        ByteArrayResource ref = new ByteArrayResource(Files.readAllBytes(Path.of(selfie.getPath()))) {
             @Override
-            public String getFilename(){
+            public String getFilename() {
                 return "ref.jpg";
             }
         };
-        body.add("Image",contentsAsResource);
-        body.add("ReferenceImage",ref);
+        body.add("Image", contentsAsResource);
+        body.add("ReferenceImage", ref);
 
-        ByteArrayResource video = new ByteArrayResource(Files.readAllBytes(Path.of(selfie.getPath()))){
+        ByteArrayResource video = new ByteArrayResource(Files.readAllBytes(Path.of(selfie.getPath()))) {
             @Override
-            public String getFilename(){
-                return "selfie.mp4";
+            public String getFilename() {
+                return "selfie." + videoFormat;
             }
         };
-        body.add("Video",video);
+        body.add("Video", video);
 
 //
         // Set headers
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-               headers.setBearerAuth(getToken());
+        headers.setBearerAuth(getToken());
 
 
         HttpEntity requestEntity = new HttpEntity<>(body, headers);
@@ -110,7 +115,8 @@ public class VideoUploader {
 ///////////////////////
 
         // Send the request
-        try{
+        try {
+
 
             ResponseEntity<VideoResponse> response = restTemplate.exchange(API_URL, HttpMethod.POST, requestEntity, VideoResponse.class);
             if(response.getStatusCode()==HttpStatus.OK){
@@ -136,6 +142,7 @@ public class VideoUploader {
             System.out.println("Response from server: " + e.getMessage());
             throw new CustomException(ErrorCode.SABTAHVALERROR,e.getMessage());
 
+
         }
     }
 
@@ -145,7 +152,7 @@ public class VideoUploader {
 
         HttpEntity req = new HttpEntity(headers);
 
-        try{
+        try {
 
             ResponseEntity<SabtAhvalTokenResponse> response =
                     restTemplate.exchange(tokenUrl, HttpMethod.POST, req, SabtAhvalTokenResponse.class);
@@ -157,8 +164,8 @@ public class VideoUploader {
                 log.error("sabt ahval get token error: " + response);
                 throw new CustomException(ErrorCode.SABTAHVAL_TOKEN_ERROR);
             }
-        }catch (Exception e){
-            log.error("sabt ahval get token error: get time out " +e);
+        } catch (Exception e) {
+            log.error("sabt ahval get token error: get time out " + e);
             throw new CustomException(ErrorCode.SABTAHVAL_TOKEN_ERROR);
         }
 
@@ -166,7 +173,7 @@ public class VideoUploader {
 
     public File getFrame(String videoAddress, String filename) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        File file=new File(uploadAddress+imagePath+filename+"_frame.jpg");
+        File file = new File(uploadAddress + imagePath + filename + "_frame.jpg");
 
         File videoFile = new File(videoAddress);
         FFmpegFrameGrabber frameGrabber = new FFmpegFrameGrabber(videoFile);
@@ -174,12 +181,12 @@ public class VideoUploader {
         frameGrabber.start();
         Java2DFrameConverter c = new Java2DFrameConverter();
         int frameCount = frameGrabber.getLengthInFrames();
-        int frameNumber=frameCount/2;
-            System.out.println("Extracting " + String.format("%04d", frameNumber) + " of " + String.format("%04d", frameCount) + " frames");
-            frameGrabber.setFrameNumber(frameNumber);
-            Frame f = frameGrabber.grab();
-            BufferedImage bi = c.convert(f);
-           var a= ImageIO.write(bi,"jpg",file);
+        int frameNumber = frameCount / 2;
+        System.out.println("Extracting " + String.format("%04d", frameNumber) + " of " + String.format("%04d", frameCount) + " frames");
+        frameGrabber.setFrameNumber(frameNumber);
+        Frame f = frameGrabber.grab();
+        BufferedImage bi = c.convert(f);
+        var a = ImageIO.write(bi, "jpg", file);
 
         frameGrabber.stop();
         return file;

@@ -26,6 +26,7 @@ public class MovieController {
     }
 
     @GetMapping("/all")
+
     public PaginationResponseDto<Movie>  getAllEnable(@RequestParam(name = "pageSize",defaultValue ="0" ) int page,
                                 @RequestParam(name = "pageSize",defaultValue = "10") int pageSize){
         return movieService.getAllEnable(page,pageSize);

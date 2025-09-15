@@ -17,7 +17,8 @@ public class CustomException extends RuntimeException{
         this.errorCode= errorCode;
     }
 
-    public CustomException(String message) {
+    public CustomException(ErrorCode code,String message) {
+        this.errorCode=code;
         this.message= message;
     }
 }

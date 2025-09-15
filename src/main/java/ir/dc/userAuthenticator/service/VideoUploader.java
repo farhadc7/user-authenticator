@@ -1,6 +1,8 @@
 package ir.dc.userAuthenticator.service;
 
 import ir.dc.userAuthenticator.dto.SabtAhvalTokenResponse;
+import ir.dc.userAuthenticator.dto.VideoResponse;
+import ir.dc.userAuthenticator.dto.VideoResponseData;
 import ir.dc.userAuthenticator.exceptions.CustomException;
 import ir.dc.userAuthenticator.exceptions.ErrorCode;
 import ir.dc.userAuthenticator.util.UploadUtil;
@@ -61,10 +63,13 @@ public class VideoUploader {
     }
 
 
-    public void upload(String selfieAddress, String customerImageAddress, String filename) throws IOException {
-        File customerImage = new File(customerImageAddress);
-        File selfie = new File(selfieAddress);
-//        File frame = getFrame(selfieAddress, filename);
+
+
+    public VideoResponseData upload(String selfieAddress, String customerImageAddress, String filename) throws IOException {
+         File customerImage= new File(customerImageAddress);
+         File selfie= new File(selfieAddress);
+         //File frame=getFrame(selfieAddress,filename);
+
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
@@ -112,10 +117,31 @@ public class VideoUploader {
         // Send the request
         try {
 
-            ResponseEntity<Object> response = restTemplate.exchange(API_URL, HttpMethod.POST, requestEntity, Object.class);
-            System.out.println("Response from server: " + response);
-        } catch (Exception e) {
-            throw new CustomException(e.getMessage());
+
+            ResponseEntity<VideoResponse> response = restTemplate.exchange(API_URL, HttpMethod.POST, requestEntity, VideoResponse.class);
+            if(response.getStatusCode()==HttpStatus.OK){
+                return response.getBody().getData();
+            }else {
+                System.out.println("Response from server: " + response);
+                if(response.getBody()!= null && response.getBody().toString().contains("1073")){
+
+                    throw new CustomException(ErrorCode.SABTAHVAL_NOT_MATCH, response.getBody()!= null?response.getBody().toString(): response.getStatusCode().toString());
+                }else {
+                    throw new CustomException(ErrorCode.SABTAHVAL_MATCHING_ISSUE, response.getBody()!= null?response.getBody().toString(): response.getStatusCode().toString());
+
+                }
+            }
+
+        }catch (Exception e){
+            if(e instanceof CustomException){
+                throw e;
+            }
+            if(e.getMessage().contains("1073")){
+                throw new CustomException(ErrorCode.SABTAHVAL_NOT_MATCH);
+            }
+            System.out.println("Response from server: " + e.getMessage());
+            throw new CustomException(ErrorCode.SABTAHVALERROR,e.getMessage());
+
 
         }
     }

@@ -14,10 +14,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -152,31 +151,33 @@ public class CustomerService {
     }
 
     public PaginationResponseDto<CustomerEntity> getAllCustomers(int page, int pageSize,CustomerEntity c) {
-        Pageable p=PageRequest.of(page,pageSize);
-        Specification<CustomerEntity> sp= Specification.anyOf();
-        if(c.getUniqueCode()!= null){
-            sp.and((root,query,cb)->
-                cb.equal(root.get("uniqueCode"),c.getUniqueCode())
-            );
-        }
-        if(c.getNationalCode()!= null){
-            sp.and((root,query,cb)->
-                    cb.equal(root.get("nationalCode"),c.getNationalCode())
-            );
-        }
-        if(c.getUniqueCode()!= null){
-            sp.and((root,query,cb)->
-                    cb.equal(root.get("uniqueCode"),c.getUniqueCode())
-            );
-        }
-        if(c.getMovie()!= null){
-            sp.and((root,query,cb)->
-                    cb.equal(root.get("movie.name"),c.getMovie().getName())
-            );
-        }
+        Pageable p=PageRequest.of(page,pageSize, Sort.by(Sort.Direction.ASC,"id"));
+//        Specification<CustomerEntity> sp= Specification.allOf();
+//        if(c.getUniqueCode()!= null){
+//            sp.and((root,query,cb)->
+//                cb.equal(root.get("uniqueCode"),c.getUniqueCode())
+//            );
+//        }
+//        if(c.getNationalCode()!= null && !c.getNationalCode().isBlank()){
+//            sp.and((root,query,cb)->
+//                    cb.equal(root.get("nationalCode"),c.getNationalCode())
+//            );
+//        }
+//        if(c.getUniqueCode()!= null && !c.getUniqueCode().isBlank()){
+//            sp.and((root,query,cb)->
+//                    cb.equal(root.get("uniqueCode"),c.getUniqueCode())
+//            );
+//        }
+//        if(c.getMovie()!= null){
+//            sp.and((root,query,cb)->
+//                    cb.equal(root.get("movie.name"),c.getMovie().getName())
+//            );
+//        }
+//
 
 
-        Page<CustomerEntity> result =customerRepository.findAll(sp,p);
+
+        Page<CustomerEntity> result =customerRepository.findAll(p);
         return new PaginationResponseDto<CustomerEntity>(page,pageSize,result.getTotalPages(),
                 result.getTotalElements(),result.getContent());
     }
@@ -254,5 +255,18 @@ public class CustomerService {
             return opt.get();
         }
         return null;
+    }
+
+    public CustomerEntity addMachineCode(String userCode,String machineCode, String desc) {
+        var opt= customerRepository.findByUniqueCode(userCode);
+        if(opt.isPresent()){
+            var ent= opt.get();
+            ent.setMachineCode(machineCode);
+            ent.setDesc(desc);
+            customerRepository.save(ent);
+            return ent;
+        }
+        return null;
+
     }
 }

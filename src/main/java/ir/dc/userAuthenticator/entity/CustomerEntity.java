@@ -30,6 +30,9 @@ public class CustomerEntity {
     private Movie movie;
     private String imagePath;
 
+    private String machineCode;
+    private String desc;
+
 
     private String firstName;
     private String lastName;
@@ -41,6 +44,8 @@ public class CustomerEntity {
     private String shenasnameSeri;
     private String officeName;
     private String officeCode;
+
+
 
     public CustomerEntity(String mobileNumber,String uniqueCode, String nationalCode, String birthdate, Movie movie) {
         this.uniqueCode=uniqueCode;

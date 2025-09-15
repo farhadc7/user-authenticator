@@ -40,7 +40,7 @@ public class CustomerController {
     }
 
     @PostMapping("/get-all")
-    public PaginationResponseDto<CustomerEntity> getAll(@RequestParam int page , @RequestParam int pageSize){
+    public PaginationResponseDto<CustomerEntity> getAll(@RequestParam("page") int page , @RequestParam("pageSize") int pageSize){
         return customerService.getAllCustomers(page,pageSize,null);
     }
 

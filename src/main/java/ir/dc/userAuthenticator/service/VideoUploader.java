@@ -86,7 +86,7 @@ public class VideoUploader {
             }
         };
 
-        ByteArrayResource ref = new ByteArrayResource(Files.readAllBytes(Path.of(selfie.getPath()))) {
+        ByteArrayResource ref = new ByteArrayResource(Files.readAllBytes(Path.of(customerImage.getPath()))) {
             @Override
             public String getFilename() {
                 return "ref.jpg";

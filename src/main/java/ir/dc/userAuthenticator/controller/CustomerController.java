@@ -4,6 +4,8 @@ import ir.dc.userAuthenticator.dto.CustomerInfoRequestDto;
 import ir.dc.userAuthenticator.dto.PaginationResponseDto;
 import ir.dc.userAuthenticator.dto.VideoValidationResponse;
 import ir.dc.userAuthenticator.entity.CustomerEntity;
+import ir.dc.userAuthenticator.exceptions.CustomException;
+import ir.dc.userAuthenticator.exceptions.ErrorCode;
 import ir.dc.userAuthenticator.service.CustomerService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +36,11 @@ public class CustomerController {
     @PostMapping("/validate-video-test")
     public VideoValidationResponse validateVideo() throws IOException {
         return customerService.validateVideotest();
+    }
+    @PostMapping("/exception-test")
+    public void exceptionTest() throws IOException {
+        throw new CustomException(ErrorCode.SABTAHVALERROR,null);
+//        return customerService.validateVideotest();
     }
     @PostMapping("/accept-conditions")
     public CustomerEntity acceptConditions(@RequestParam("userCode") String userCode)  {

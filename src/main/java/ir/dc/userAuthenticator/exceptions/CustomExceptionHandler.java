@@ -16,8 +16,12 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ExceptionResponse> handleInputValidationException(CustomException ex, WebRequest request){
         log.error("handler: ",ex);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResponse(ex.getErrorCode().getValue(),
-                ex.getErrorCode().getReasonPhraseFa(),ex.getMessage()
-        ));
+        if(ex.getErrorCode()!= null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResponse(ex.getErrorCode().getValue(),
+                    ex.getErrorCode().getReasonPhraseFa(),ex.getMessage()
+            ));
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResponse(-100,"exception",ex.getMessage()));
+        }
     }
 }

@@ -1,6 +1,7 @@
 package ir.dc.userAuthenticator.controller;
 
 import ir.dc.userAuthenticator.dto.MovieRequestDto;
+import ir.dc.userAuthenticator.dto.MovieStatus;
 import ir.dc.userAuthenticator.dto.PaginationResponseDto;
 import ir.dc.userAuthenticator.entity.Movie;
 import ir.dc.userAuthenticator.service.MovieService;
@@ -28,9 +29,9 @@ public class MovieController {
     @GetMapping("/all")
 
     public PaginationResponseDto<Movie>  getAllEnable(@RequestParam(name = "pageSize",defaultValue ="0" ) int page,
-                                @RequestParam(name = "pageSize",defaultValue = "10") int pageSize){
-        return movieService.getAllEnable(page,pageSize);
-
+                                                      @RequestParam(name = "pageSize",defaultValue = "10") int pageSize
+            , @RequestParam(name = "status",defaultValue = "ACTIVE") MovieStatus status){
+        return movieService.getAllEnable(page,pageSize,status);
     }
 
     @PutMapping("/enable")

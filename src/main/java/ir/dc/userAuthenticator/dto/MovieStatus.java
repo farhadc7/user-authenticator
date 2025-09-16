@@ -1,5 +1,5 @@
 package ir.dc.userAuthenticator.dto;
 
 public enum MovieStatus {
-    ACTIVE,NOT_ACTIVE
+    ACTIVE,NOT_ACTIVE,ALL
 }

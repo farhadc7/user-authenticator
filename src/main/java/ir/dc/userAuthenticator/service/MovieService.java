@@ -60,9 +60,15 @@ public class MovieService {
         return new Movie(dto.getMovieName(),MovieStatus.ACTIVE);
     }
 
-    public PaginationResponseDto<Movie> getAllEnable(int page, int pageSize) {
+    public PaginationResponseDto<Movie> getAllEnable(int page, int pageSize, MovieStatus status) {
         Pageable pageable = PageRequest.of(page, pageSize);
-        Page<Movie> result =repository.findAllByStatusIs(MovieStatus.ACTIVE,pageable);
+        Page<Movie> result= null;
+        if(status==MovieStatus.ALL){
+             result =repository.findAll(pageable);
+        }else {
+             result =repository.findAllByStatusIs(status,pageable);
+        }
+
         return new PaginationResponseDto<Movie>(page,pageSize,result.getTotalPages(),
                 result.getTotalElements(),result.getContent());
     }

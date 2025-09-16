@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -198,13 +199,19 @@ public class CustomerService {
         return ent;
     }
 
+    @Transactional
     public VideoValidationResponse validateVideo(MultipartFile video, String uniqueCode) throws IOException {
          Optional<CustomerEntity> customerEntity = customerRepository.findByUniqueCode(uniqueCode);
          if(customerEntity.isEmpty()){
              log.error("validateVideo : user not found with unique code : "+uniqueCode);
              throw new CustomException(ErrorCode.USER_NOT_FOUND);
          }
+
          String videoAddress =uploadUtil.uploadSelfie(video,uniqueCode+"."+videoFormat);
+        var customer= customerEntity.get();
+        customer.setVideoPath(videoAddress);
+        customerRepository.save(customer);
+
 
         var res=videoUploader.upload(videoAddress,customerEntity.get().getImagePath(),uniqueCode);
         VideoValidationResponse v= new VideoValidationResponse();

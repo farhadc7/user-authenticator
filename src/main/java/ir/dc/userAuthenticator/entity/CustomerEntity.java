@@ -29,6 +29,7 @@ public class CustomerEntity {
     @ManyToOne
     private Movie movie;
     private String imagePath;
+    private String videoPath;
 
     private String machineCode;
     private String desc;

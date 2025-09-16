@@ -7,8 +7,6 @@ import ir.dc.userAuthenticator.exceptions.CustomException;
 import ir.dc.userAuthenticator.exceptions.ErrorCode;
 import ir.dc.userAuthenticator.util.UploadUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
-import org.apache.hc.core5.http.ContentType;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;

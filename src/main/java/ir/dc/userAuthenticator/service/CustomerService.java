@@ -156,8 +156,8 @@ public class CustomerService {
         return c;
     }
 
-    public PaginationResponseDto<CustomerEntity> getAllCustomers(int page, int pageSize,CustomerEntity c) {
-        Pageable p=PageRequest.of(page,pageSize, Sort.by(Sort.Direction.ASC,"id"));
+    public PaginationResponseDto<CustomerEntity> getAllCustomers(int page, int pageSize,CustomerEntity c,String order) {
+        Pageable p=PageRequest.of(page,pageSize, Sort.by(Sort.Direction.fromString(order),"id"));
 //        Specification<CustomerEntity> sp= Specification.allOf();
 //        if(c.getUniqueCode()!= null){
 //            sp.and((root,query,cb)->

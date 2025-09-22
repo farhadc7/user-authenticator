@@ -57,8 +57,11 @@ public class CustomerController {
     @PostMapping("/get-all")
 
     public PaginationResponseDto<CustomerEntity> getAll(@RequestParam(name = "page",defaultValue = "0")
-                                                            int page , @RequestParam(name="pageSize",defaultValue = "10") int pageSize){
-        return customerService.getAllCustomers(page,pageSize,null);
+                                                            int page , @RequestParam(name="pageSize",
+            defaultValue = "100") int pageSize,@RequestParam(name = "order",defaultValue = "DESC") String order
+
+    ){
+        return customerService.getAllCustomers(page,pageSize,null,order);
     }
 
     @PostMapping("/add-machine-code")

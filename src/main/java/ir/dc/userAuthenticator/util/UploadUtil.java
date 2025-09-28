@@ -22,6 +22,8 @@ public class UploadUtil {
     private String uploadAddress;
     String path = "/images/profile-img/";
     String videoPath = "/video/selfie/";
+    @Value("${video-sample-path}")
+    String movieSamplePath;
 
     public String uploadSelfie(MultipartFile file, String fileName) throws IOException {
 
@@ -68,4 +70,11 @@ public class UploadUtil {
     }
 
 
+    public String uploadSample(MultipartFile video) throws IOException {
+        String uploadDir = uploadAddress + movieSamplePath;
+
+        String filePath = FileUploadUtil.saveFile(uploadDir, video.getOriginalFilename(), video);
+
+        return uploadDir +"/"+ video.getOriginalFilename();
+    }
 }

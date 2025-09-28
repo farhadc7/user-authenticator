@@ -1,25 +1,27 @@
 package ir.dc.userAuthenticator.service;
 
-import ir.dc.userAuthenticator.dto.MovieDto;
-import ir.dc.userAuthenticator.dto.MovieRequestDto;
-import ir.dc.userAuthenticator.dto.MovieStatus;
-import ir.dc.userAuthenticator.dto.PaginationResponseDto;
+import ir.dc.userAuthenticator.dto.*;
 import ir.dc.userAuthenticator.entity.Movie;
 import ir.dc.userAuthenticator.repository.MovieRepository;
+import ir.dc.userAuthenticator.util.UploadUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
 public class MovieService {
     private final MovieRepository repository;
+    private final UploadUtil uploadUtil;
 
-    public MovieService(MovieRepository repository) {
+    public MovieService(MovieRepository repository, UploadUtil uploadUtil) {
         this.repository = repository;
+        this.uploadUtil = uploadUtil;
     }
 
     private List<Movie> getAll(){
@@ -71,5 +73,11 @@ public class MovieService {
 
         return new PaginationResponseDto<Movie>(page,pageSize,result.getTotalPages(),
                 result.getTotalElements(),result.getContent());
+    }
+
+    public VideoSampleResponse uploadSample(MultipartFile video) throws IOException {
+        String videoAddress =uploadUtil.uploadSample(video);
+        return new VideoSampleResponse(videoAddress);
+
     }
 }

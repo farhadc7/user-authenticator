@@ -71,7 +71,7 @@ public class CustomerService {
     }
 
 
-    public String saveRecord(CustomerInfoRequestDto dto) throws IOException {
+    public FinalResponse saveRecord(CustomerInfoRequestDto dto) throws IOException {
         CustomerDto customerDto;
         customerDto = mapToDto(dto);
 
@@ -80,19 +80,21 @@ public class CustomerService {
 
         String code =getAlphaNumericString(10);
 
-        String imagePath = getPicture(dto,code);
+        var imageRes = getPicture(dto,code);
+        String imagePath = imageRes.getImagePath();
         customerDto.setImagePath(imagePath);
-
         customerDto.setUniqueCode(code);
-
         customerRepository.save(mapToEntity(customerDto));
-        return code;
+
+        return new FinalResponse(imageRes,infoResp);
     }
 
-    private String getPicture(CustomerInfoRequestDto customerDto,String code) throws IOException {
-        String image= getImage(customerDto).getImage();
+    private SabtAhvalImageResponseWrapper getPicture(CustomerInfoRequestDto customerDto,String code) throws IOException {
+        var res= getImage(customerDto);
+        String image= res.getImage();
         String path=uploadProfileImage(image,code);
-        return path;
+
+        return new SabtAhvalImageResponseWrapper(image,res.getMessage(),path);
 
 
     }

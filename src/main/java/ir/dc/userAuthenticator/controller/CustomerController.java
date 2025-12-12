@@ -1,6 +1,7 @@
 package ir.dc.userAuthenticator.controller;
 
 import ir.dc.userAuthenticator.dto.CustomerInfoRequestDto;
+import ir.dc.userAuthenticator.dto.FinalResponse;
 import ir.dc.userAuthenticator.dto.PaginationResponseDto;
 import ir.dc.userAuthenticator.dto.VideoValidationResponse;
 import ir.dc.userAuthenticator.entity.CustomerEntity;
@@ -23,7 +24,7 @@ public class CustomerController {
     }
 
     @PostMapping("/validate-info")
-    public String validation(@RequestBody CustomerInfoRequestDto dto) throws IOException {
+    public FinalResponse validation(@RequestBody CustomerInfoRequestDto dto) throws IOException {
         return customerService.saveRecord(dto);
 
     }

@@ -10,8 +10,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public  class FinalResponse {
-    private SabtAhvalImageResponseWrapper imageResponse;
-    private SabtAhvalResponse sabtAhvalResponse;
+    private SabtAhvalInfoResponseWrapper imageResponse;
+    private SabtAhvalInfoResponseWrapper sabtAhvalResponse;
+    private String code;
 
 
 }

@@ -75,8 +75,9 @@ public class CustomerService {
         CustomerDto customerDto;
         customerDto = mapToDto(dto);
 
-        SabtAhvalResponse infoResp = getInfo(dto);
-        setSabtAhvalInfoToCustomerDto(customerDto, infoResp);
+        SabtAhvalInfoResponseWrapper infoResp = getInfo(dto);
+        var info = objectMapper.convertValue(infoResp.getResult().getData(),SabtAhvalResponse.class);
+        setSabtAhvalInfoToCustomerDto(customerDto, info);
 
         String code =getAlphaNumericString(10);
 
@@ -86,15 +87,17 @@ public class CustomerService {
         customerDto.setUniqueCode(code);
         customerRepository.save(mapToEntity(customerDto));
 
-        return new FinalResponse(imageRes,infoResp);
+        return new FinalResponse(imageRes.getResult(),infoResp,code);
     }
 
     private SabtAhvalImageResponseWrapper getPicture(CustomerInfoRequestDto customerDto,String code) throws IOException {
-        var res= getImage(customerDto);
+        var r= getImage(customerDto);
+        var res = objectMapper.convertValue(r, SabtAhvalImageResponse.class);
+
         String image= res.getImage();
         String path=uploadProfileImage(image,code);
 
-        return new SabtAhvalImageResponseWrapper(image,res.getMessage(),path);
+        return new SabtAhvalImageResponseWrapper(image,res.getMessage(),path,r);
 
 
     }
@@ -111,18 +114,17 @@ public class CustomerService {
         customerDto.sabtAhvalSetter(infoResp);
     }
 
-    private SabtAhvalResponse getInfo(CustomerInfoRequestDto customerDto) {
-        Object result=callSabtAhval(customerDto,sabtahvalInfoUrl);
-        var successResult = objectMapper.convertValue(result, SabtAhvalResponse.class);
-        return successResult;
+    private SabtAhvalInfoResponseWrapper getInfo(CustomerInfoRequestDto customerDto) {
+        SabtAhvalInfoResponseWrapper result=  callSabtAhval(customerDto,sabtahvalInfoUrl);
+//        var successResult = objectMapper.convertValue(result, SabtAhvalResponse.class);
+        return result;
     }
-    private SabtAhvalImageResponse getImage(CustomerInfoRequestDto customerDto) {
-        Object result=callSabtAhval(customerDto,sabtahvalImageUrl);
-        var successResult = objectMapper.convertValue(result, SabtAhvalImageResponse.class);
-        return successResult;
+    private SabtAhvalInfoResponseWrapper getImage(CustomerInfoRequestDto customerDto) {
+        SabtAhvalInfoResponseWrapper result=callSabtAhval(customerDto,sabtahvalImageUrl);
+        return result;
     }
 
-    private Object callSabtAhval(CustomerInfoRequestDto customerDto,String url) {
+    private SabtAhvalInfoResponseWrapper callSabtAhval(CustomerInfoRequestDto customerDto,String url) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBasicAuth(sabtAhvalUsername, sabtAhvalPass);
         Map<String, String> body = new HashMap<>();
@@ -136,7 +138,7 @@ public class CustomerService {
         if (response.getStatusCode() == HttpStatus.OK) {
             if (response.getBody().getResult().getStatus().getStatusCode() == 200) {
 
-                return response.getBody().getResult().getData();
+                return response.getBody();
 
             } else {
                 log.error("sabt haval info error: " + response);

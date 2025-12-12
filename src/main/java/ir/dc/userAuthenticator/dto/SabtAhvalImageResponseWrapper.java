@@ -13,6 +13,7 @@ public  class SabtAhvalImageResponseWrapper {
     private String image;
     private String message;
     private String imagePath;
+    private SabtAhvalInfoResponseWrapper result;
 
 
 }

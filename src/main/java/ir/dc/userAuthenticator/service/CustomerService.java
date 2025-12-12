@@ -132,22 +132,28 @@ public class CustomerService {
         body.put("birthDate", customerDto.getBirthDate());
         HttpEntity<Map<String, String>> req = new HttpEntity(body, headers);
 
-        ResponseEntity<SabtAhvalInfoResponseWrapper> response =
-                restTemplate.exchange(url, HttpMethod.POST, req, SabtAhvalInfoResponseWrapper.class);
+        try{
+            ResponseEntity<SabtAhvalInfoResponseWrapper> response =
+                    restTemplate.exchange(url, HttpMethod.POST, req, SabtAhvalInfoResponseWrapper.class);
 
-        if (response.getStatusCode() == HttpStatus.OK) {
-            if (response.getBody().getResult().getStatus().getStatusCode() == 200) {
+            if (response.getStatusCode() == HttpStatus.OK) {
+                if (response.getBody().getResult().getStatus().getStatusCode() == 200) {
 
-                return response.getBody();
+                    return response.getBody();
 
+                } else {
+                    log.error("sabt haval info error: " + response);
+                    throw new CustomException(ErrorCode.SABTAHVALERROR);
+                }
             } else {
-                log.error("sabt haval info error: " + response);
+                log.error("sabt haval error: " + response);
                 throw new CustomException(ErrorCode.SABTAHVALERROR);
             }
-        } else {
-            log.error("sabt haval error: " + response);
-            throw new CustomException(ErrorCode.SABTAHVALERROR);
+        }catch (Exception e){
+            log.error("error while calling sabt:",e);
+            throw new CustomException(ErrorCode.SABTAHVALERROR,e.getMessage());
         }
+
     }
 
 
